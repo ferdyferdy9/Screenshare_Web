@@ -11,10 +11,10 @@ private:
 public:
 	std::wstring fileName;
 	ULONG quality;
-	
+
 	CaptureWindow();
 	~CaptureWindow();
-	void capture();
+	void capture(int x, int y, int w, int h);
 	void screenshot(POINT a, POINT b);
 	int GetEncoderClsid(const WCHAR* format, CLSID* pClsid);
 };

@@ -6,6 +6,7 @@
 
 void Request_Handler(webserver::http_request* r);
 
+int x,y,w,h;
 int frameRate, quality;
 char * buffer;
 long long length;
@@ -14,16 +15,16 @@ std::string fileBuffer;
 void myLoop(){
 	std::string filepath;
 	std::ifstream is;
-	
+
 	CaptureWindow cw;
 	cw.quality = quality;
 	while(1){
 		cw.fileName = L"test.jpg";
-		cw.capture();
+		cw.capture(x,y,w,h);
 		filepath = "test.jpg";
-		
+
 		is.open(filepath, std::ifstream::binary);
-		if(!is.is_open()) 
+		if(!is.is_open())
 			std::cout << "bloody file is nowhere to be found. Call the cops\n";
 		delete[] buffer;
 		is.seekg (0, is.end);
@@ -32,15 +33,15 @@ void myLoop(){
 		buffer = new char [length];
 		is.read (buffer,length);
 		is.close();
-		
+
 		std::this_thread::sleep_for(std::chrono::milliseconds(frameRate));
-		
+
 		cw.fileName = L"test2.jpg";
-		cw.capture();
+		cw.capture(x,y,w,h);
 		filepath = "test2.jpg";
-		
+
 		is.open(filepath, std::ifstream::binary);
-		if(!is.is_open()) 
+		if(!is.is_open())
 			std::cout << "bloody file is nowhere to be found. Call the cops\n";
 		delete[] buffer;
 		is.seekg (0, is.end);
@@ -49,45 +50,47 @@ void myLoop(){
 		buffer = new char [length];
 		is.read (buffer,length);
 		is.close();
-		
+
 		std::this_thread::sleep_for(std::chrono::milliseconds(frameRate));
 	}
 }
 
 int main() {
+    std::cout << "x y w h : ";
+    std::cin >> x >> y >> w >> h;
 	std::cout << "Input frameRate : ";
 	std::cin >> frameRate;
 	frameRate = 1000/frameRate;
-	
+
 	std::cout << "Input quality : ";
 	std::cin >> quality;
-	
+
 	webserver server;
 	std::thread th(myLoop);
-	
+
 	system("ipconfig");
-	
+
 	server.start(8080, Request_Handler);
-	
+
 	return 0;
 }
 
 void Request_Handler(webserver::http_request* r)
 {
     Socket s = *(r->s_);
-	
+
 	if(r->accept_ == "image/webp,*/*" || r->path_ == "/test.jpg"){
 		s.SendBytes("HTTP/1.1 200 OK\r\nContent-Length:" + std::to_string(length) + "\nContent-type: image/webp\r\n\r\n");
-		
+
 		int sckt = s.s_;
 		const char *ptr = static_cast<const char*>(buffer);
 		send(sckt, ptr, length, 0);
 
 		s.Close();
-		
+
 		return;
 	}
-	
+
     std::string title;
     std::string body;
     std::string bgcolor="#ffffff";
@@ -166,7 +169,7 @@ void Request_Handler(webserver::http_request* r)
 	r->answer_ += "</head>\n<body bgcolor='" + bgcolor + "'>";
     r->answer_ += body;
     r->answer_ += "</body>";
-	r->answer_ += 
+	r->answer_ +=
 				"<script>\n"
 				"	var refreshInterval = " + std::to_string(frameRate) + ";\n"
 				"	var timer = setInterval(function () {\n"
