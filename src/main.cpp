@@ -6,7 +6,7 @@
 
 void Request_Handler(webserver::http_request* r);
 
-int frameRate;
+int frameRate, quality;
 char * buffer;
 long long length;
 std::string fileBuffer;
@@ -16,10 +16,11 @@ void myLoop(){
 	std::ifstream is;
 	
 	CaptureWindow cw;
+	cw.quality = quality;
 	while(1){
-		cw.fileName = L"test.png";
+		cw.fileName = L"test.jpg";
 		cw.capture();
-		filepath = "test.png";
+		filepath = "test.jpg";
 		
 		is.open(filepath, std::ifstream::binary);
 		if(!is.is_open()) 
@@ -34,9 +35,9 @@ void myLoop(){
 		
 		std::this_thread::sleep_for(std::chrono::milliseconds(frameRate));
 		
-		cw.fileName = L"test2.png";
+		cw.fileName = L"test2.jpg";
 		cw.capture();
-		filepath = "test2.png";
+		filepath = "test2.jpg";
 		
 		is.open(filepath, std::ifstream::binary);
 		if(!is.is_open()) 
@@ -58,6 +59,9 @@ int main() {
 	std::cin >> frameRate;
 	frameRate = 1000/frameRate;
 	
+	std::cout << "Input quality : ";
+	std::cin >> quality;
+	
 	webserver server;
 	std::thread th(myLoop);
 	
@@ -72,7 +76,7 @@ void Request_Handler(webserver::http_request* r)
 {
     Socket s = *(r->s_);
 	
-	if(r->accept_ == "image/webp,*/*" || r->path_ == "/test.png"){
+	if(r->accept_ == "image/webp,*/*" || r->path_ == "/test.jpg"){
 		s.SendBytes("HTTP/1.1 200 OK\r\nContent-Length:" + std::to_string(length) + "\nContent-type: image/webp\r\n\r\n");
 		
 		int sckt = s.s_;
@@ -99,7 +103,7 @@ void Request_Handler(webserver::http_request* r)
     {
         title = "Screenshare Server";
 		body  = "\n<div id=\"Viewer\" class=\"imgPreview\">\n"
-				"	<img id=\"imgPrev\" src=\"test.png\" class=\"img-responsive\"/>\n"
+				"	<img id=\"imgPrev\" src=\"test.jpg\" class=\"img-responsive\"/>\n"
 				"</div>\n"
 				"</br><button id=\"btnFullscreen\">Fullscreen</button>\n";
     }
@@ -167,7 +171,7 @@ void Request_Handler(webserver::http_request* r)
 				"	var refreshInterval = " + std::to_string(frameRate) + ";\n"
 				"	var timer = setInterval(function () {\n"
 				"		var ImagePreview = document.getElementById('imgPrev');\n"
-				"		ImagePreview.src = 'test.png?rand=' + Math.random();\n"
+				"		ImagePreview.src = 'test.jpg?rand=' + Math.random();\n"
 				"	}, refreshInterval)\n"
 				"   function requestFullScreen(element) {\n"
 				"   // Supports most browsers and their versions.\n"

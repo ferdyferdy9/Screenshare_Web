@@ -33,15 +33,23 @@ void CaptureWindow::screenshot(POINT a, POINT b)
     HBITMAP hBitmap = CreateCompatibleBitmap(hScreen, w, h);
     HGDIOBJ old_obj = SelectObject(hDc, hBitmap);
     BitBlt(hDc, 0, 0, w, h, hScreen, a.x, a.y, SRCCOPY);
-
+	
     Gdiplus::Bitmap bitmap(hBitmap, NULL);
     CLSID clsid;
 
-    GetEncoderClsid(L"image/png", &clsid);
-
+    GetEncoderClsid(L"image/jpeg", &clsid);
+	
+	Gdiplus::EncoderParameters encoderParameters;
+	
+	encoderParameters.Count = 1;
+	encoderParameters.Parameter[0].Guid = Gdiplus::EncoderQuality;
+	encoderParameters.Parameter[0].Type = Gdiplus::EncoderParameterValueTypeLong;
+	encoderParameters.Parameter[0].NumberOfValues = 1;
+	encoderParameters.Parameter[0].Value = &quality;
+	
     //GDI+ expects Unicode filenames
 	fileName = L"./" + fileName;
-    bitmap.Save(fileName.c_str(), &clsid, NULL);
+    bitmap.Save(fileName.c_str(), &clsid, &encoderParameters);
 	
     SelectObject(hDc, old_obj);
     DeleteDC(hDc);

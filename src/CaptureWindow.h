@@ -10,6 +10,7 @@ private:
 	ULONG_PTR gdiplusToken;
 public:
 	std::wstring fileName;
+	ULONG quality;
 	
 	CaptureWindow();
 	~CaptureWindow();
