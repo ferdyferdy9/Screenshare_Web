@@ -108,7 +108,8 @@ void Request_Handler(webserver::http_request* r)
 		body  = "\n<div id=\"Viewer\" class=\"imgPreview\">\n"
 				"	<img id=\"imgPrev\" src=\"test.jpg\" class=\"img-responsive\"/>\n"
 				"</div>\n"
-				"</br><button id=\"btnFullscreen\">Fullscreen</button>\n";
+				"<button id=\"btnFullscreen\">Fullscreen</button>\n"
+				"<button onclick=\"popup()\">Pop Up</button>\n";
     }
     else if (r->path_ == "/auth")
     {
@@ -148,7 +149,7 @@ void Request_Handler(webserver::http_request* r)
         body      += "Path is : &gt;" + r->path_ + "&lt;";
     }
 
-    r->answer_  = "<html><head><title>";
+    r->answer_  = "<html>\n  <head><title>";
     r->answer_ += title;
     r->answer_ += "</title>\n";
 	r->answer_ += "    <style>\n"
@@ -168,7 +169,6 @@ void Request_Handler(webserver::http_request* r)
 				  "    </style>\n";
 	r->answer_ += "</head>\n<body bgcolor='" + bgcolor + "'>";
     r->answer_ += body;
-    r->answer_ += "</body>";
 	r->answer_ +=
 				"<script>\n"
 				"	var refreshInterval = " + std::to_string(frameRate) + ";\n"
@@ -188,12 +188,16 @@ void Request_Handler(webserver::http_request* r)
 				"           wscript.SendKeys(\"{F11}\");\n"
 				"        }\n"
 				"     }\n"
-				"   }"
-				"   var btnFullscreen = document.getElementById('btnFullscreen');"
-				"   btnFullscreen.onclick = function () {"
-				"     var viewer = document.getElementById('Viewer');"
-				"     requestFullScreen(viewer);"
-				"   };"
-				"</script>";
+				"   }\n"
+				"   var btnFullscreen = document.getElementById('btnFullscreen');\n"
+				"   btnFullscreen.onclick = function () {\n"
+				"     var viewer = document.getElementById('Viewer');\n"
+				"     requestFullScreen(viewer);\n"
+				"   };\n"
+				"   function popup() {\n"
+				"      window.open(\"/\", \"_blank\", \"width=320,height=320,scrollbars=0,status=0\");\n"
+				"   };\n"
+				"</script>\n";
+	r->answer_ += "</body>\n";
 	r->answer_ += "</html>";
 }
