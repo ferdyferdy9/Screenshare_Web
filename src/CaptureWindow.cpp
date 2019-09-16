@@ -15,7 +15,7 @@ void CaptureWindow::capture(int x, int y, int w, int h){
 	RECT      rc;
     GetClientRect(GetDesktopWindow(), &rc);
     POINT a{ x, y };
-    POINT b{ w, h };
+    POINT b{ x+w, y+h };
 
     screenshot(a, b);
 }
